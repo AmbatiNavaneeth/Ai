@@ -114,9 +114,262 @@ For example:
 - Your application receives and displays the answer.
 
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+1. The basic architecture
+When you wrote code to connect Python to an LLM, you used several components that work together.
+
+Your Python application
+Contains the prompt and application logic
+
+SDK / HTTP request
+Prepares and sends the request
+
+LLM API
+Authenticates the request and provides access to the model
+
+LLM model
+Processes the input and generates output
+
+Python receives the response
+Extracts and displays the generated text
+
+
+2. Important terms in LLM connectivity
+1. LLM — Large Language Model
+An AI model trained on large amounts of data to understand and generate language.
+Examples include GPT models, Gemini models, and Claude models.
+
+Interview question: What is an LLM?
+Answer: An LLM is a deep-learning model trained on large amounts of data to understand context and generate text, answer questions, summarize information, and perform other language-related tasks.
+
+2. API — Application Programming Interface
+An API allows different software applications to communicate with each other through a defined interface.
+For example, your Python application sends a prompt to an LLM provider's API and receives a response.
+Think of it as a communication channel between your application and the model service.
+
+Interview question: Why do we use an API to connect to an LLM?
+Answer: We use an API to send inputs to a hosted LLM and receive its outputs without having to host or train the entire model ourselves.
+
+3. SDK — Software Development Kit
+An SDK is a collection of tools and code libraries that makes it easier to use a service from a programming language.
+For example, when you installed the openai Python package, you installed an SDK that simplifies making requests to the OpenAI API.
+
+Without an SDK, you can still call the API directly using HTTP requests, but you would handle more of the request construction yourself.
+
+Interview question: What is the difference between an API and an SDK?
+Answer:
+- API: Defines how your application communicates with a service.
+- SDK: Provides convenient code and tools to interact with that service.
+
+4. API key
+An API key is a credential used to identify or authenticate your application when it accesses an API.
+
+Example .env file:
+OPENAI_API_KEY=your_actual_api_key
+
+Your Python code reads the key and supplies it to the SDK.
+Why use an environment variable? It keeps the key separate from your application code, reducing the risk of accidentally exposing it in GitHub.
+Important: an API key is not the same as an API endpoint, and a key alone does not guarantee access. Account permissions, billing, and usage limits can also apply.
+
+5. Endpoint
+An endpoint is a specific URL where an API accepts requests.
+For example, an API might expose an endpoint for generating model responses. The SDK knows how to call the appropriate endpoint when you use its response-generation method.
+
+Think of it this way:
+- API = the interface or set of rules for communication.
+- Endpoint = the particular address you send a request to.
+- SDK = the library that helps you make that request.
+Interview question: What is an API endpoint?
+
+Answer: An API endpoint is a specific URL through which an application accesses a particular API operation or resource.
+
+6. HTTP request and response
+HTTP is a protocol used to communicate over the web.
+
+When your application calls an LLM API, it generally sends an HTTP request and receives an HTTP response.
+- Request: The data your application sends.
+- Response: The data the server returns.
+- Status code: An HTTP code indicating the result of the request.
+Common status codes:
+Code	Meaning
+200	Request succeeded
+400	Invalid request
+401	Authentication failed or credentials are invalid
+403	Access is forbidden
+429	Rate limit or quota exceeded
+500	Server encountered an error
+
+The exact cause of an error depends on the API provider and response details.
+
+7. JSON
+JSON stands for JavaScript Object Notation. It is a common format for exchanging structured data between applications.
+
+For example, a request might contain:
+{
+  "model": "gpt-4.1-mini",
+  "input": "Explain Python functions"
+}
+
+
+Here, model and input are keys, and their values tell the API which model to use and what input to process.
+
+Interview question: Why is JSON used in APIs?
+Answer: JSON is a lightweight, structured format that makes it easy for applications to exchange data
+
+Note that an API request being formatted as JSON is not the same as asking the LLM to generate a structured JSON answer. We'll learn that separately in prompt engineering and structured outputs.
+
+8. Prompt
+A prompt is the instruction, question, or other input you give to an LLM.
+
+Example:
+input = "Explain Python functions with an example."
+A clear prompt usually produces a more useful response than a vague one, although good prompting cannot guarantee correctness.
+
+Interview question: What is prompt engineering?
+Answer: Prompt engineering is the process of designing and improving instructions and input context to guide an LLM toward a desired output.
+
+9. Model
+A model is the specific AI system that processes the input and generates output.
+In this code:
+response = client.responses.create(    model="gpt-4.1-mini",    input="Explain Python functions.")
+gpt-4.1-mini specifies the model. The model name must be available to your API account and supported by the endpoint you're using.
+Different models can vary in cost, speed, capabilities, and response quality.
+
+Interview question: Why do we specify a model in an API call?
+Answer: We specify a model to choose which available AI model should process our input.
+
+10. Tokens
+Tokens are the small units of text that a language model processes and generates. A token can be a whole word, part of a word, or punctuation.
+For example, the sentence "I love Python!" is split into tokens internally, but the exact tokenization depends on the model's tokenizer.
+
+Tokens matter because they can affect:
+- API usage cost.
+- How much input the model can accept.
+- How long a response can be.
+Interview question: What is a token in an LLM?
+
+Answer: A token is a unit of text processed by an LLM. Tokens are used to measure input and output length and often determine API usage costs.
+
+3. Terms related to your Python code
+Let's connect these concepts to the actual code you used.
+import osfrom dotenv import load_dotenvfrom openai import OpenAIload_dotenv()client = OpenAI(    api_key=os.getenv("OPENAI_API_KEY"))response = client.responses.create(    model="gpt-4.1-mini",    input="Explain Python functions.")print(response.output_text)
+
+
+Code	What it means
+import os	Imports Python utilities, including environment-variable access
+load_dotenv()	Loads values from your .env file
+os.getenv()	Reads an environment variable
+OpenAI()	Creates the SDK client
+client.responses.create()	Sends a request to generate a model response
+model	Selects the model
+input	Supplies the prompt
+response	Holds the returned response object
+response.output_text	Retrieves the generated text
+print()	Displays the text in your terminal
+
+Three more terms you'll encounter:
+- Inference: Using a trained model to generate an output from an input.
+- Latency: The time taken to receive a response.
+- Rate limit: A restriction on how frequently or how much you can use an API within a specified period.
+
+4. Common errors and how to handle them
+Error	What to check
+API key error	Verify your key and environment variable
+Model not found	Check the model name and account access
+429 error	Check rate limits, quota, and billing
+Network error	Check internet connectivity and service status
+Invalid request	Check your parameters and input format
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+system role
+
+The system role is a special instruction that sets the permanent rules, personality, and boundaries for the AI model before the user ever types a single word.
+Think of it as programming the AI's attitude and behavior.
+While your code runs inside the loop, the user role changes with every new prompt you type, but the system role stays completely locked in to control how the AI reacts to you.
+
+🎭 The 3 Core Roles Explained
+To see why the system role is so unique, look at how it compares to the other roles you send to the SDK:
+
+system	- The Director / Boss	Sets the background rules, tone, constraints, and persona (e.g., "You are a strict math teacher").
+user	  - You (The Human)	Sends the actual dynamic questions, code snippets, or tasks into the terminal loop.
+assistant -	The AI Model	The output response generated back to you by the model based on the system instructions.
+
+
+------------------------------------------
+temperature
+
+Think of Temperature as a knob that controls how creative or how strict the AI is.
+Imagine the AI is an assistant you are talking to:
+• Low Temperature (0.0): The AI acts like a strict scientist. It will only tell you direct, proven facts. If you ask it the same question 10 times, it will give you the exact same answer every single time. It never takes risks.
+• High Temperature (1.0 or higher): The AI acts like an artist or storyteller. It gets highly creative, uses wild imagination, and tells stories. If you ask it the exact same question twice, it will give you completely different, unique answers.
+
+Why do we use it in code?
+When you are building your chatbot, you pass this number to the SDK:
+• If you want the AI to write perfect Python code, you set temperature=0.0 (because you want strict rules, not artistic code).
+• If you want the AI to write a poem or a movie script, you set temperature=1.0 (because you want it to be creative).
+
+---------------------------------------------------------
+LLM API parameters
+When you call an LLM API, you can control what you send to the model and how much output you want back.
+1. The basic API call
+response = client.responses.createmodel="gpt-4.1-mini",    input="Explain Python functions.")print(response.output_text)
+
+Here, model selects the model and input contains your prompt.
+Let's understand the other important controls.
+
+2. System instructions vs user input
+A chatbot often receives two kinds of instructions.
+- System/developer instructions: Define how the assistant should behave.
+- User input: Contains the question or task from the user.
+For example, with the Chat Completions API:
+response = client.chat.completions.create (  
+                      model="gpt-4.1-mini",   
+                     messages=[{ "role": "system", 
+                                  "content": "You are a Python tutor. Explain simply."
+                                }, 
+                                { "role": "user",
+                                 "content": "What is a function?" 
+                                 }])
+  print(response.choices[0].message.content)
 
 
 
+Expected output might be:
+A function is a reusable block of code that performs a specific task.
+
+The system instruction sets the assistant's behaviour; the user message provides the actual question.
+Note: this example uses the Chat Completions API, which has a different response structure from the Responses API you used earlier.
+
+3. Temperature
+Temperature is a parameter supported by some model APIs that influences how variable or predictable the generated output is.
+- Lower temperature: generally more predictable responses.
+- Higher temperature: generally more varied responses.
+For example, a creative-writing application may benefit from more variation, while a structured extraction task may prefer more predictable output.
+
+Important: Not every model or API endpoint supports a temperature setting. Don't add it blindly.
+
+4. Maximum output tokens
+This controls the maximum amount of output the model can generate, where supported.
+
+For example, a short-answer chatbot may need a smaller output limit than an application that summarizes long documents.
+A limit that's too low can cause the answer to stop before it's complete.
+5. How do you read the API response?
+In your original code:
+response = client.responses.create(    model="gpt-4.1-mini",    input="What is Python?")print(response.output_text)
+
+The API returns a response object. The SDK exposes the generated text through response.output_text.
+
+You can also inspect the usage information when available:
+print(response.usage)
+Usage information can include input and output token counts, which help you understand consumption and costs.
+
+6. Error handling
+Real applications must handle API failures.
+from openai import OpenAI, APIErrorclient = OpenAI()try:    response = client.responses.create(        model="gpt-4.1-mini",        input="Explain Python functions."    )    print(response.output_text)except APIError as e:    print("API request failed:", e)
+
+This catches API-related errors so your application can report a failure rather than terminating with an unhandled exception. In production, you would usually handle authentication errors, rate limits, network failures, and retries more specifically.
 
 
 
