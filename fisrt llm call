@@ -371,9 +371,107 @@ from openai import OpenAI, APIErrorclient = OpenAI()try:    response = client.re
 
 This catches API-related errors so your application can report a failure rather than terminating with an unhandled exception. In production, you would usually handle authentication errors, rate limits, network failures, and retries more specifically.
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. What is a token?
+A token is a small piece of text that an LLM processes. A token can be a whole word, part of a word, punctuation, or a symbol.
+
+Example:
+
+I love Python!
+
+The model might split this into tokens like:
+
+["I", " love", " Python", "!"]
+
+This is only an illustration; the exact split depends on the model's tokenizer.
+
+Remember: 1 token is not always equal to 1 word. As a rough estimate, 100 English tokens may be around 60–80 words, but this varies.
+2. Prompt tokens
+Prompt tokens are the tokens in the input sent to the model.
+
+Example:
+response = client.responses.create(    model="gpt-4.1-mini",    input="Explain Python dictionaries.")
 
 
 
+Here, "Explain Python dictionaries." is your input prompt. Its token count contributes to the prompt/input tokens.
+
+Prompt tokens can include:
+- Your question.
+- System or developer instructions.
+- Conversation history.
+- Other input content, such as supplied text.
+3. Completion tokens
+Completion tokens are the tokens the model generates in its response.
+
+For example, you ask:
+Explain Python dictionaries.
+
+The model replies:
+A dictionary stores data in key-value pairs.
+
+The tokens used to generate that answer are completion/output tokens.
+4. Total tokens
+Total tokens means the combined input and output tokens used for a request.
+\[
+\text{Total tokens} = \text{Prompt tokens} + \text{Completion tokens}
+\]
+
+Example:
+Prompt tokens20
+
+Completion tokens80
+
+
+Total tokens
+100
+
+
+These numbers are illustrative. Actual token counts depend on the text and model.
+5. Maximum completion tokens
+Maximum completion tokens is the upper limit you set for how many tokens the model can generate in its response.
+
+For example:
+response = client.responses.create(    model="gpt-4.1-mini",    input="Explain Python dictionaries.",    max_output_tokens=100)
+
+
+
+Here, the model is allowed to generate up to 100 output tokens.
+- If it finishes in 60 tokens, that's fine.
+- If it needs more than the limit, the response may stop before the answer is complete.
+- Setting a limit doesn't mean the model must generate that many tokens.
+Note: In the Responses API, the parameter is named max_output_tokens. Some other APIs use different parameter names.
+6. Stop condition
+A stop condition is the reason the model stops generating its response.
+
+Common cases include:
+Stop reason	Meaning
+Natural completion	The model finished its answer.
+Output token limit	The response reached the configured output limit.
+Stop sequence	A configured sequence tells generation to stop, where supported.
+Tool handoff	The model requests a tool call instead of continuing with a normal text answer.
+
+The exact names and behavior depend on the API.
+
+For example, if you set a limit of 20 output tokens and the model reaches it before finishing its explanation, the response can be incomplete.
+
+Important: Stop condition and maximum completion tokens are different. The maximum is a limit you configure; the stop condition describes why generation ended.
+7. How these terms connect
+Your prompt
+
+Input tokens
+
+LLM processes the input
+
+Model generates an answer
+
+Completion/output tokens
+
+Generation stops
+
+Natural finish, token limit, tool handoff, or another stop condition
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
