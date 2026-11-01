@@ -1,0 +1,15 @@
+      Topic	                                   Simple meaning                                                  	Example
+LLM connectivity	            Connect Python to an AI model	                                         Send a question to an LLM API
+Prompt engineering	           Give the model clear instructions	                                  Ask it to act as a Python tutor
+Structured JSON	              Get data in a fixed format	                                      Return {"skill":"Python","level":"beginner"}
+Embeddings	                  Represent text as numerical vectors	                                Convert a resume into a vector
+Vector database	              Store and search vectors by similarity	                           Find resumes similar to a job description
+RAG	                         Retrieve relevant information before generating an answer	        Chat with your college placement PDFs
+Re-ranking	                 Reorder search results by relevance	                                Put the most relevant document first
+Graph database	             Store connected entities and relationships	                         Represent people, companies, and their connections
+LangGraph	                   Build stateful, multi-step AI workflows                            	Research → analyze → summarize
+Tool calling	               Let an LLM request a function's execution                               	Call a weather or database lookup function
+MCP                        	A standard way for AI applications to connect to tools and data sources  	Connect an AI assistant to a supported file-search server
+AI agents                  	Systems that use models and tools to complete tasks	                       An interview preparation assistant
+Agent loops                	Repeat model/tool steps until a stopping condition                   	Search → inspect → search again → answer
+Event loops                	Coordinate asynchronous operations	                            Handle multiple API requests without blocking on each one
