@@ -1,0 +1,146 @@
+output you want.
+1. Why do we need prompt engineering?
+Suppose you ask an LLM:
+
+Prompt 1:
+Explain Python.
+
+
+The response might be very broad.
+
+Now try:
+
+Prompt 2:
+Act as a Python tutor.
+Explain Python dictionaries to a beginner.
+Include:
+1. Definition
+2. Syntax
+3. Real-world example
+4. Python code
+5. Output
+
+Use simple English and avoid advanced concepts.
+
+
+The second prompt gives the model clearer instructions, so it can produce a more useful response.
+
+That's the basic idea of prompt engineering.
+2. Important components of a good prompt
+A good prompt often contains these five components:
+Component	Purpose
+Role	Defines who the AI should act as
+Task	Explains what it should do
+Context	Provides background information
+Constraints	Defines limitations or rules
+Output format	Specifies how the answer should look
+
+Example:
+Role:
+You are an experienced Python interviewer.
+
+Task:
+Generate 5 interview questions about Python dictionaries.
+
+Context:
+The candidate is a fresher with basic Python knowledge.
+
+Constraints:
+Keep questions beginner-friendly.
+Avoid repeating questions.
+
+Output format:
+Return the questions as a numbered list.
+
+
+Let's understand each:
+- Role: Python interviewer.
+- Task: Generate five questions.
+- Context: Candidate is a fresher.
+- Constraints: Beginner-friendly, no repetition.
+- Output format: Numbered list.
+3. Different prompting techniques
+These are some important techniques you should know.
+A. Zero-shot prompting
+Giving the LLM a task without providing examples.
+Classify this review as positive or negative:
+
+"The product quality is excellent."
+
+
+The model performs the task based on its existing capabilities.
+B. One-shot prompting
+Providing one example before asking the actual question.
+Example:
+Review: "I love this product."
+Sentiment: Positive
+
+Now classify:
+Review: "The product is terrible."
+Sentiment:
+
+
+You provide one example to guide the model.
+C. Few-shot prompting
+Providing multiple examples to guide the model.
+Review: "Amazing product."
+Sentiment: Positive
+
+Review: "Very poor quality."
+Sentiment: Negative
+
+Review: "I really enjoyed using it."
+Sentiment: Positive
+
+Now classify:
+Review: "I regret buying this."
+Sentiment:
+
+
+The model uses the examples to understand the expected pattern.
+D. Chain-of-thought prompting
+Encouraging the model to work through a problem in steps rather than jumping directly to an answer.
+
+For example:
+Solve this problem.
+Break the solution into clear steps.
+Explain the important reasoning behind the answer.
+
+
+This can help with complex tasks, although asking for detailed hidden internal reasoning is not necessary. You can ask for a concise explanation of the solution instead.
+E. Role-based prompting
+Assigning a role to the model.
+You are a senior Django developer.
+Explain Django ORM to a fresher with a practical example.
+
+
+This helps establish the desired perspective and style.
+4. Practical implementation using Python
+Let's connect prompt engineering with the OpenAI API code you already learned.
+
+Create prompt_demo.py:
+from dotenv import load_dotenvfrom openai import OpenAIload_dotenv()client = OpenAI()response = client.responses.create(    model="gpt-4.1-mini",    instructions="""    You are an experienced Python tutor.    Explain concepts in simple English.    Always include an example.    """,    input="Explain Python dictionaries to a beginner.")print(response.output_text)
+
+
+
+Here:
+- instructions defines the model's general role and behavior.
+- input contains the actual task.
+- response.output_text retrieves the generated answer.
+You can experiment by changing the instructions and comparing the responses.
+5. Where is prompt engineering used in real projects?
+Project	Prompt engineering use
+Resume Analyzer	Extract skills and evaluate resume content
+PDF Chatbot	Answer questions using supplied document context
+AI Interview Agent	Generate questions based on a job description
+Customer Support Bot	Answer in a helpful and professional manner
+AI Email Generator	Generate emails with a specified tone
+
+For example, in your future RAG chatbot, you might instruct the LLM:
+Answer the user's question using only the
+provided document context.
+
+If the answer is not available in the context,
+say "Information not found in the document."
+
+Keep the answer simple and concise.
