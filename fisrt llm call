@@ -473,7 +473,147 @@ Natural finish, token limit, tool handoff, or another stop condition
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+1. What is JSON?
+JSON (JavaScript Object Notation) is a text format used to store and exchange structured data between applications.
 
+For example, suppose you ask an LLM to extract a person's details. It might return a paragraph, but your Python program needs the name, age, and skills separately.
+
+JSON lets you represent those details in a predictable structure.
+{
+  "name": "Navaneeth",
+  "age": 22,
+  "skills": ["Python", "SQL", "Django"],
+  "is_fresher": true
+}
+
+
+Understanding JSON syntax
+JSON element	Meaning	Example
+{}	An object containing key-value pairs	"name": "Navaneeth"
+[]	An array (list of values)	["Python", "SQL"]
+Key	The name of a field; must use double quotes	"age"
+String	Text inside double quotes	"Python"
+Number	Numeric value without quotes	22
+Boolean	True or false, written lowercase	true
+null	Represents no value	"experience": null
+
+Remember these rules:
+- JSON uses double quotes for keys and strings.
+- JSON uses true, false, and null, not Python's True, False, and None.
+- JSON is a text format, not a Python dictionary.
+2. JSON vs Python dictionary
+They look similar, but they are different.
+
+Python dictionary:
+person = {    "name": "Navaneeth",    "age": 22,    "is_fresher": True}
+
+
+
+JSON string:
+person_json = '''{    "name": "Navaneeth",    "age": 22,    "is_fresher": true}'''
+
+
+
+Python provides the json module to convert between these formats.
+import json# Python dictionary -> JSON stringperson = {"name": "Navaneeth", "age": 22}json_text = json.dumps(person)print(json_text)# JSON string -> Python dictionarydata = json.loads(json_text)print(data["name"])
+
+
+
+Output:
+{"name": "Navaneeth", "age": 22}
+Navaneeth
+
+
+- json.dumps() converts a Python object into a JSON string.
+- json.loads() parses a JSON string into a Python object.
+3. What is structured output?
+Structured output means asking an LLM to return data in a predefined format or schema, rather than returning arbitrary text.
+
+Suppose you ask:
+Extract the candidate's name, skills, and years of experience from this resume.
+
+An ordinary response might be:
+The candidate is Navaneeth. He knows Python, SQL, and Django and has no professional experience yet.
+
+That is readable, but your application has to interpret the paragraph.
+
+With structured output, you can request this format:
+{
+  "name": "Navaneeth",
+  "skills": ["Python", "SQL", "Django"],
+  "years_of_experience": 0
+}
+
+
+Your program can now access each field directly.
+print(data["name"])print(data["skills"])
+
+
+
+Output:
+Navaneeth
+['Python', 'SQL', 'Django']
+
+
+Why is structured output useful?
+- Resume analyzers can extract candidate details.
+- PDF chatbots can return answers with sources in specific fields.
+- Interview preparation agents can return questions, answers, and difficulty levels.
+- Backend applications can pass consistent data to a frontend.
+Important distinction: Simply telling an LLM, “Return JSON,” does not always guarantee valid JSON. Structured-output features can enforce a supported schema more reliably.
+4. What is Pydantic?
+Pydantic is a Python library used to validate data against defined types and rules. It can also convert validated data into JSON.
+
+For example, you want candidate details with these requirements:
+- name must be a string.
+- age must be an integer.
+- skills must be a list of strings.
+Pydantic lets you define these requirements in a Python model.
+
+Install it:
+python -m pip install pydantic
+
+
+Create a file named pydantic_demo.py:
+from pydantic import BaseModelclass Candidate(BaseModel):    name: str    age: int    skills: list[str]candidate = Candidate(    name="Navaneeth",    age=22,    skills=["Python", "SQL", "Django"])print(candidate.name)print(candidate.skills)print(candidate.model_dump_json())
+
+
+
+Output:
+Navaneeth
+['Python', 'SQL', 'Django']
+{"name":"Navaneeth","age":22,"skills":["Python","SQL","Django"]}
+
+
+How does it work?
+- BaseModel is the base class used to define your data model.
+- name: str declares that the name should be a string.
+- age: int declares that the age should be an integer.
+- skills: list[str] declares a list containing strings.
+- model_dump_json() serializes the model into JSON.
+If you provide an incompatible value, such as "twenty-two" for age, Pydantic normally raises a validation error instead of accepting it as an integer.
+
+Pydantic can also generate a JSON Schema describing the expected fields and types.
+5. How do they work together in an AI application?
+1. User input
+
+"Extract this candidate's details."
+
+2. LLM
+
+Extracts the information
+
+3. Structured JSON output
+
+Returns name, age, and skills in defined fields
+
+4. Pydantic validation
+
+Checks that the returned data matches the expected schema
+
+5. Your Python application
+
+Uses the validated fields in the app
 
 
 
