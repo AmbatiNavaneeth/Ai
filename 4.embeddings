@@ -75,6 +75,114 @@ For example, an embedding might have 384, 768 or 1536 dimensions, depending on t
 - PDF chatbots
 - Semantic search
 - Recommendation systems
+
+Embeddings – Part 1: Understanding vectors
+Let's start with one question:
+
+How can a computer understand that "I love coding" and "I enjoy programming" have similar meanings?
+
+Computers don't naturally understand the meaning of sentences. We need to represent text in a mathematical format.
+
+That's what embeddings do.
+1. What is a vector?
+A vector is simply a list of numbers.
+
+For example:
+vector = [0.25, 0.67, 0.89, 0.12]
+
+
+
+Here:
+- It contains 4 numerical values.
+- Each value represents one dimension.
+- Therefore, this is a 4-dimensional vector.
+An embedding model converts text into vectors.
+
+For example:
+"I love coding"
+       |
+       v
+Embedding Model
+       |
+       v
+[0.25, 0.67, 0.89, 0.12]
+
+
+These numbers collectively represent the semantic information captured by the model.
+
+Important: Individual dimensions generally don't have simple human-readable meanings. The model learns useful numerical representations during training.
+2. How does an embedding model work?
+Consider these three sentences:
+sentences = [    "I love coding",    "I enjoy programming",    "I love eating pizza"]
+
+
+
+We pass them to an embedding model.
+
+It generates vectors for each sentence.
+Illustrative embedding output
+I love coding
+
+[0.81, 0.42, 0.91]
+
+I enjoy programming
+
+[0.79, 0.45, 0.89]
+
+I love eating pizza
+
+[0.12, 0.88, 0.21]
+
+
+Coding ↔ Programming
+More similar
+
+Coding ↔ Pizza
+Less similar
+
+
+This is the important concept:
+- Similar meanings generally produce similar vectors.
+- Different meanings generally produce less similar vectors.
+This is called semantic similarity.
+3. What are embedding dimensions?
+Suppose an embedding model generates:
+vector = [0.23, 0.45, 0.67, 0.89]
+
+
+
+It has 4 dimensions.
+
+But real embedding models can generate much larger vectors.
+
+For example:
+Model configuration	Dimensions
+Small embedding model	384
+Medium embedding model	768
+Some OpenAI embedding models	1536
+Some larger embedding models	3072
+
+The number of dimensions depends on the embedding model.
+4. Why do we need embeddings in RAG?
+Let's connect this to our PDF chatbot.
+
+Suppose your PDF contains:
+
+"Python lists are mutable, whereas tuples are immutable."
+
+The user asks:
+
+"Which Python data structure cannot be modified?"
+
+The wording is different, but the meaning is related.
+
+A keyword search might struggle because the exact words don't match.
+
+An embedding model converts both the document chunk and the question into vectors.
+
+Then a similarity search finds the relevant chunk.
+
+That's how embeddings help RAG retrieve information based on meaning rather than exact keyword matches.
 - Document retrieval
 
 
