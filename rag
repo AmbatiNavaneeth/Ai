@@ -1,0 +1,170 @@
+1. First, understand the problem with LLMs
+We know that LLMs (Large Language Models) like GPT, Gemini and Claude are trained on huge amounts of data.
+
+They can:
+- Understand natural language.
+- Answer questions.
+- Generate text.
+- Summarize documents.
+- Write code.
+But they have some limitations.
+
+Problem 1: They don't know your private data.
+
+Imagine you have a PDF containing your company's employee policies.
+
+You ask ChatGPT:
+
+"What is our company's leave policy?"
+
+ChatGPT doesn't automatically know what's inside your private PDF.
+
+Problem 2: Knowledge limitations
+
+LLMs have a knowledge cutoff. They might not know recent information or newly updated company documents.
+
+Problem 3: Hallucinations
+
+Sometimes LLMs generate answers that sound correct but are actually wrong.
+
+For example:
+
+You ask: "According to my PDF, what is the leave policy?"
+
+The LLM might generate an answer based on its general training knowledge instead of your actual document.
+
+We need a solution that allows an LLM to answer questions using external, specific information.
+
+That's why RAG became important.
+2. What is RAG?
+Important AI Engineer concept
+RAG stands for Retrieval-Augmented Generation.
+
+Definition:
+
+RAG is a technique that combines information retrieval with LLMs to generate answers using relevant external data provided at query time.
+
+Let's break down the three words:
+Word	Meaning
+Retrieval	Finding relevant information
+Augmented	Providing additional context to the LLM
+Generation	Generating an answer using that context
+
+In simple words:
+
+Instead of asking an LLM to answer everything from its own knowledge, we first retrieve relevant information from our documents and give it to the LLM to generate an answer.
+3. How does RAG work?
+Let's take our PDF Chatbot example.
+
+You upload a 100-page PDF about Python.
+
+Then you ask:
+
+"What is the difference between a list and a tuple?"
+
+Your application follows this process:
+RAG workflow
+Upload PDF
+100-page Python document
+
+Document processing
+Extract text and split into smaller chunks
+
+Generate embeddings
+Convert chunks into numerical vectors
+
+Store in vector database
+Save vectors and associated text
+
+User asks a question
+Question: What is a list vs tuple?
+Convert the question into an embedding
+
+Similarity search
+Find the most relevant document chunks
+
+Send context + question to LLM
+LLM receives relevant information
+
+Generate final answer
+Answer based on retrieved PDF content
+
+There are two important stages here.
+
+Stage A: Indexing (before the user asks anything)
+1. Upload the PDF.
+2. Extract text.
+3. Split text into chunks.
+4. Generate embeddings.
+5. Store them in a vector database.
+Stage B: Retrieval and generation (when the user asks a question)
+1. Receive the user's question.
+2. Generate its embedding.
+3. Search for similar vectors.
+4. Retrieve relevant chunks.
+5. Send retrieved chunks and the question to the LLM.
+6. Generate an answer.
+Remember these two stages. Interviewers often ask about them.
+4. Why not directly give the entire PDF to the LLM?
+Good question.
+
+Imagine your PDF has 1,000 pages.
+
+Sending the entire PDF every time:
+- Uses more tokens.
+- Increases API cost.
+- Can exceed the model's context window.
+- Makes it harder to focus on relevant information.
+RAG solves this by retrieving only the relevant portions of the document.
+
+For example:
+
+You ask about Python lists.
+
+Instead of sending all 1,000 pages, the retrieval system might find just three relevant chunks.
+
+The LLM receives those chunks and generates the answer.
+5. RAG vs Fine-tuning
+This is a very common interview question.
+RAG	Fine-tuning
+Retrieves external information at query time	Further trains a model on specific examples
+Knowledge comes from retrieved context	Changes model behavior and learned patterns
+Documents can be updated without retraining the LLM	New training may be needed for new behavior
+Useful for private documents and knowledge bases	Useful for adapting style, format or task behavior
+
+Example:
+- RAG: Make a chatbot answer questions using your company's PDF documents.
+- Fine-tuning: Train a model to consistently respond in a particular format or specialized style.
+They can also be used together.
+6. Important RAG terminology
+Before moving forward, understand these terms.
+Term	Purpose
+Chunking	Splitting documents into smaller pieces
+Embeddings	Converting text into numerical vectors
+Vector database	Storing and searching vectors
+Similarity search	Finding semantically related content
+Retriever	Component that fetches relevant chunks
+Context	Information provided to the LLM
+Prompt template	Structure used to send instructions and context
+LLM	Generates the final response
+
+
+In the AI world, we divide this into two different types of RAG systems: Developer-Driven RAG (Static) and User-Driven RAG (Dynamic).
+Here is exactly how both scenarios work:
+
+Scenario A: The Developer Adds the PDFs (Developer-Driven)
+
+In this setup, the user cannot upload files. The developer pre-loads the system with all the documents.
+• How it works: The developer collects 500 company policy PDFs, processes them into the vector database, and locks it.
+• The User Experience: When a user visits the website, they can only ask questions about that specific data. For example, a company's internal HR chatbot where employees ask, "What is our maternity leave policy?"
+• Storage: The database is permanent and managed entirely by the developer.
+
+Scenario B: The User Uploads the PDFs (User-Driven)
+
+In this setup, the website provides an "Upload PDF" button for the end-user.
+• How it works:
+	1. The user uploads a 50-page legal contract PDF.
+	2. The application instantly slices that PDF into paragraphs, turns them into vectors, and drops them into a temporary session database created just for that specific user.
+	3. The user asks questions about their document.
+	4. When the user closes the browser or logs out, the temporary vector database for that session is completely deleted to save storage costs and protect privacy.
+• The User Experience: This is how tools like "ChatWithPDF" or Google Gemini's advanced document upload features work.
