@@ -1,0 +1,81 @@
+Topic: Embeddings
+1. First, why do we need embeddings?
+Let's take a real-world example.
+
+Imagine you're building your PDF Chatbot.
+
+You upload a PDF containing information about Python.
+
+Then you ask:
+
+"What is Python used for?"
+
+Your application needs to:
+1. Understand what information you're asking for.
+2. Find the relevant content inside the PDF.
+3. Send that content to the LLM.
+4. Generate an answer.
+But here's the problem:
+
+Computers don't understand the meaning of sentences like humans do.
+
+They work with numerical data.
+
+So how can a computer understand that these two sentences are related?
+- "Python is a programming language."
+- "Python is used for software development."
+The words are different, but their meanings are related.
+
+This is where embeddings come in.
+2. What are embeddings?
+Definition: Embeddings are numerical representations of text (words, sentences, or documents) in the form of vectors, where semantically similar texts have vectors that are closer to each other.
+
+Let's understand this.
+
+Suppose we have three sentences:
+- Sentence A: I love programming.
+- Sentence B: I enjoy coding.
+- Sentence C: I like eating pizza.
+An embedding model converts these sentences into numerical vectors.
+Example (illustrative vectors, not actual model output)
+SENTENCE A
+
+I love programming.
+
+[0.82, 0.34, 0.91]
+
+
+SENTENCE B
+
+I enjoy coding.
+
+[0.79, 0.38, 0.88]
+
+
+SENTENCE C
+
+I like eating pizza.
+
+[0.12, 0.91, 0.21]
+
+Notice how A and B have more similar numerical representations than A and C.
+
+The embedding model captures semantic relationships, not just matching keywords.
+3. Important terminology
+Term	Meaning
+Embedding model	Model that converts text into vectors
+Vector	List of numerical values
+Dimensions	Number of values in a vector
+Semantic similarity	How closely two texts are related in meaning
+Vector similarity	Mathematical comparison between vectors
+
+For example, an embedding might have 384, 768 or 1536 dimensions, depending on the model.
+4. Where are embeddings used?
+- RAG applications
+- PDF chatbots
+- Semantic search
+- Recommendation systems
+- Document retrieval
+
+
+- AI-powered search engines
