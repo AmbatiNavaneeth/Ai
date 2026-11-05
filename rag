@@ -205,3 +205,4 @@ This is exactly the step we corrected in your previous Python script.
 	2. Your code formats a brand-new prompt: Context: {database_chunks} \n\n Question: {user_question}.
 	3. You send this augmented prompt to your LLM (like your Groq client).
 	4. The LLM reads the context and generates a fact-based ans
+-0-------------------------------------------------------------------------------------------------------------------------------------------
