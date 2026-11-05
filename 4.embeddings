@@ -185,5 +185,56 @@ Then a similarity search finds the relevant chunk.
 That's how embeddings help RAG retrieve information based on meaning rather than exact keyword matches.
 - Document retrieval
 
-
 - AI-powered search engines
+------------------------------------------------------------------------------------------------------------------
+converting text to embeddings (vectors)using embeddin models
+1. What is Sentence Transformers?
+sentence-transformers is a Python library that provides pretrained models to convert sentences and paragraphs into embeddings.
+
+We'll use a lightweight model called all-MiniLM-L6-v2.
+
+Why this model?
+- Beginner-friendly.
+- Runs locally.
+- No API key required.
+- Generates 384-dimensional embeddings.
+- Useful for learning semantic search and RAG.
+
+Generate your first embedding
+Create a file called main.py.
+
+from sentence_transformers import SentenceTransformer
+# Load the embedding model
+model = SentenceTransformer("all-MiniLM-L6-v2")
+# Input text
+text = "Python is a programming language"
+# Generate embedding
+embedding = model.encode(text)
+print(embedding)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
