@@ -1,0 +1,161 @@
+4: Vector Databases
+1. First, understand the problem
+In our previous example, we generated embeddings for five chunks.
+
+We stored them in a Python variable:
+chunk_embeddings = model.encode(chunks)
+
+This works for five chunks.
+
+But imagine a real application:
+- 1,000 PDF documents.
+- 50,000 chunks.
+- Millions of embeddings.
+Would storing everything in a Python list be a good approach?
+
+Not really.
+
+We need a system that can:
+- Store millions of vectors.
+- Search for similar vectors efficiently.
+- Retrieve the most relevant chunks.
+- Maintain the original text and metadata.
+This is why vector databases are used.
+2. What is a Vector Database?
+Definition: A vector database is a specialized database designed to store, manage, and search numerical vectors (embeddings) based on their similarity.
+
+In simple words:
+
+A normal database stores and retrieves information using values and conditions.
+
+A vector database stores embeddings and helps find information based on semantic similarity.
+3. Normal database vs Vector database
+Let's understand with an example.
+
+Suppose you have a normal MySQL database containing:
+ID	Text
+1	Python is a programming language
+2	Python is used in machine learning
+3	JavaScript is used for websites
+
+You search:
+SELECT * FROM documents
+WHERE text LIKE '%Python%';
+
+
+This searches based on matching text.
+
+But what if you search:
+
+"What language is useful for machine learning?"
+
+The exact word matching may not find all relevant information.
+
+A vector database can compare the meaning of your question with the stored embeddings.
+Feature	MySQL	Vector database
+Stores text	Yes	Yes, as associated data
+Stores numerical vectors	Possible	Designed for this
+Keyword search	Yes	Depends on database
+Semantic similarity search	Not its standard strength	Core capability
+Similarity-based retrieval	Requires additional implementation	Built-in functionality
+
+Important: Vector databases don't replace traditional databases. Both can be used together.
+4. What happens inside a vector database?
+Let's connect it to our RAG application.
+
+Suppose we have three chunks:
+chunks = [    "Python is a programming language.",    "Python is used in machine learning.",    "JavaScript is used for web development."]
+
+
+We generate embeddings and store them in a vector database.
+
+Conceptually, the database stores:
+Vector database storage
+ID	Original text	Embedding
+C1	Python is a programming language.	[0.23, 0.45, ...]
+C2	Python is used in ML.	[0.72, 0.31, ...]
+C3	JavaScript is used for websites.	[0.15, 0.89, ...]
+
+Illustrative data. Actual embeddings contain hundreds of dimensions.
+A vector database can also store:
+- IDs: Unique identifiers for chunks.
+- Documents: Original text.
+- Embeddings: Numerical vectors.
+- Metadata: Additional information such as filename, page number and category.
+When a user asks a question, we pass its embedding to the database.
+
+The database performs similarity search and returns the most relevant records.
+5. Popular vector databases
+Here are some names you should know as an AI Engineer.
+chrimaDb,pinecone,Faiss,Weaviate,Quadrant
+
+----------------------------------------------------------------------------------------------------------------------------
+1. What is Qdrant?
+Qdrant is an open-source vector database designed to store, search and retrieve vector embeddings efficiently.
+
+In simple words:
+
+Qdrant stores numerical vectors and helps us find the most relevant information based on semantic similarity.
+
+For example, imagine your PDF chatbot contains 10,000 document chunks.
+
+A user asks:
+
+"What is Python used for?"
+
+Qdrant searches through the stored embeddings and retrieves the most relevant chunks.
+
+The LLM then uses those chunks to generate an answer.
+2. How does Qdrant work?
+Let's understand its architecture.
+Qdrant workflow
+  
+Document chunks
+Extracted from PDF
+
+Embedding model
+Converts text into vectors
+
+Qdrant Database
+Stores vectors, payload and IDs
+
+Similarity Search
+Finds the nearest vectors
+
+Top K relevant chunks
+
+LLM generates the answer
+
+
+3. What does Qdrant store?
+Qdrant stores data as Points.
+
+A point contains three important things:
+1. ID – Unique identifier.
+2. Vector – Numerical embedding.
+3. Payload – Additional information associated with the vector.
+Example:
+{    "id": 1,    "vector": [0.23, 0.45, 0.67, 0.89],    "payload": {        "text": "Python is a programming language",        "page": 5,        "filename": "python.pdf"    }}
+
+
+
+Let's understand these:
+Component	Purpose
+ID	Identifies the record
+Vector	Used for similarity search
+Payload	Stores original text and metadata
+
+Important: Payload is similar to additional information attached to a record. It allows us to filter search results using fields such as filename, page number or category.
+4. Important Qdrant terminology
+Term	Meaning
+Collection	Group of points
+Point	Individual record
+Vector	Numerical representation
+Payload	Metadata and associated information
+Similarity search	Finds similar vectors
+Filtering	Restricts search using conditions
+HNSW	Graph-based approximate nearest-neighbour search algorithm
+
+One important concept:
+
+HNSW (Hierarchical Navigable Small World) is an algorithm that helps Qdrant search for nearest vectors efficiently without comparing every vector in a large dataset.
