@@ -212,7 +212,78 @@ text = "Python is a programming language"
 embedding = model.encode(text)
 print(embedding)
 
+Embeddings – Part 3: Cosine Similarity
+Now we know how to convert text into numerical vectors.
 
+But here's the next question:
+
+How do we know whether two sentences have similar meanings by comparing their vectors?
+
+For that, we use Cosine Similarity.
+1. Why do we need cosine similarity?
+Imagine our PDF contains these sentences:
+sentences = [    "Python is a programming language",    "Python is used for software development",    "I love eating pizza"]
+
+
+
+A user asks:
+
+"Tell me about Python programming."
+
+Our embedding model converts the question and all three sentences into vectors.
+
+But how do we identify which sentence is most relevant?
+
+We need a mathematical method to compare the vectors.
+
+That's where cosine similarity comes in.
+2. What is cosine similarity?
+Definition: Cosine similarity is a mathematical technique used to measure how similar two vectors are by calculating the cosine of the angle between them.
+
+In simple words:
+
+It measures how closely two vectors point in the same direction.
+Understanding similarity scores
+1.0
+Very similar direction
+
+0.5
+Some similarity
+
+0.0
+Perpendicular directions
+
+-1.0
+Opposite directions
+
+These are mathematical reference points. Actual scores depend on the embedding model and data.
+
+
+4. Cosine similarity formula
+You don't need to memorize the derivation right now, but understand the formula.
+\[
+\text{Cosine Similarity} =
+\frac{A \cdot B}{\|A\|\|B\|}
+\]
+
+
+6. How is this used in RAG?
+This is the important connection.
+
+Imagine your PDF has 100 chunks.
+
+You ask:
+
+"What is Python used for?"
+
+The RAG application:
+1. Converts the question into an embedding.
+2. Compares the question embedding with document chunk embeddings.
+3. Calculates similarity scores.
+4. Ranks the chunks based on similarity.
+5. Retrieves the most relevant chunks.
+6. Sends them to the LLM.
+This process is called semantic retrieval.
 
 
 
