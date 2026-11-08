@@ -1,0 +1,182 @@
+RAG -Query transformation 
+1. What is query transformation?
+Query transformation means modifying or improving the user's original question before sending it to the retriever.
+Why do we need it?
+Sometimes users ask vague, incomplete or poorly worded questions. Directly embedding those questions may produce poor retrieval results.
+Example:
+User asks: "What about Django?" This question doesn't provide enough context.
+
+We can transform it into: "What are the features and uses of the Django Python web framework?"
+Now retrieval has a clearer question to work with.
+
+2. How does it work?
+    Original user query
+    LLM transforms the query
+    Improved query
+    Embedding + vector search
+    Relevant chunks
+
+3. Different query transformation techniques
+Query rewriting	- Rewrites the question more clearly
+Query expansion	- Adds related terms to the question
+Multi-query retrieval	- Generates multiple versions of the question
+HyDE- Generates a hypothetical document and embeds it
+
+1. Query Rewriting: A technique that rewrites the user's original question into a clearer form without changing its meaning, to improve document retrieval.
+2. Query Expansion: A technique that adds related keywords or terms to the original query to retrieve more relevant documents.
+3. Multi-Query Retrieval: A technique where an LLM generates multiple alternative versions of the user's question and retrieves documents using all those queries.
+4. HyDE (Hypothetical Document Embeddings): A technique where an LLM generates a hypothetical answer or document, converts it into an embedding, and uses that embedding to retrieve relevant real documen
+
+When you are talking about methods like Query Rewriting, Query Expansion, Multi-Query Retrieval, and HyDE (Hypothetical Document Embeddings), an LLM is acting as a "pre-processor" or translator. 
+It takes a messy, vague, or short user query and transforms it into a highly optimized format before anything touches the embedding model or vector database.
+
+----------------------------------------------------------------------
+1. Query Rewriting ; A technique that rewrites the user's original question into a clearer form without changing its meaning, to improve document retrieval.
+Example:
+Original: How does Django work with DB?
+Rewritten: How does Django ORM interact with relational databases?
+The improved query is embedded and sent to the retriever.
+
+2. Query Expansion: A technique that adds related keywords or terms to the original query to retrieve more relevant documents.
+Example:
+Original:Django authentication
+Expanded:Django authentication, login, logout, user sessions, permissions, password management
+This can help retrieve documents containing related terminology.
+
+->context-aware query rewriting
+Important point for your portfolio chatbot
+Suppose a recruiter asks:
+"What about your second project?"
+Your chatbot should use conversation history to understand which project they mean before retrieving information.
+This is called context-aware query rewriting.
+For example:
+Previous question: "Explain your Service Hub project."
+Follow-up: "What technologies did you use in it?"
+Rewritten retrieval query:"What technologies were used in the Service Hub project?" - This is especially useful for follow-up questions.
+
+3.Multi-Query Retrieval?
+Multi-Query Retrieval means using an LLM to generate multiple versions of the user's original question and searching with all those questions.
+Why do we need it?
+Sometimes a user asks a question using different wording than the wording used in the documents. A single query may not retrieve all relevant chunks.
+Example
+User asks:
+"What is Django ORM?"
+The LLM generates three alternative queries:
+1. What is the Django Object Relational Mapper?
+2. How does Django interact with databases?
+3. How are database queries handled in Django?
+Now we have four queries, including the original one.
+
+How does it work?
+Original user question -> LLM generates multiple queries -> Query 1Query 2Query 3Original query ->Search vector database for each query ->Combine and remove duplicate results ->Final relevant chunks → LLM
+
+We can use LangChain's MultiQueryRetriever.
+
+Install:
+pip install langchain-classic langchain-qdrant langchain-groq
+Simplified example:
+from langchain_classic.retrievers.multi_query import MultiQueryRetriever
+retriever = MultiQueryRetriever.from_llm(   
+                           retriever=vector_store.as_retriever(search_kwargs={"k": 3}), llm=llm)
+results = retriever.invoke("What is Django ORM?")
+
+Here:
+- vector_store → Your vector database connection.
+- as_retriever() → Creates a retriever.
+- k=3 → Retrieves 3 chunks per generated query.
+- llm → Generates alternative queries.
+- invoke() → Executes retrieval.
+
+
+vector_store → Your vector database connection.
+as_retriever() → Creates a retriever.
+k=3 → Retrieves 3 chunks per generated query.
+llm → Generates alternative queries.
+invoke() → Executes retrieval.
+
+Advantages and disadvantages
+Advantages
+- Better retrieval coverage.
+- Finds relevant chunks with different wording.
+- Useful for complex questions.
+Disadvantages
+- More LLM calls or token usage.
+- More retrieval operations.
+- May retrieve duplicate or irrelevant chunks
+
+
+4.HyDE (Hypothetical Document Embeddings): A technique where an LLM generates a hypothetical answer or document, converts it into an embedding, and uses that embedding to retrieve relevant real documents.
+It is a retrieval technique where an LLM generates a hypothetical answer or document based on the user's question.
+Instead of converting the original question directly into an embedding, we convert the hypothetical document into an embedding and use it to search the vector database.
+Simple idea: Search using an expected answer rather than just the question.
+
+ex:-Django ORM allows developers to interact with databases using Python objects. It supports CRUD operations and migrations.
+User asks:
+"What happens behind the scenes when Django saves data?"
+The question and document use different wording.Directly embedding the question might not retrieve the best matching chunk. HyDE tries to improve this.
+
+When should we use HyDE?
+- When question wording differs significantly from document wording.
+- When users ask complex or descriptive questions.
+- When direct vector retrieval gives poor results.
+
+from groq import Groq
+from sentence_transformers import SentenceTransformer
+client = Groq()
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+question = "What happens when Django saves data?"
+
+# Step 1: Generate hypothetical document
+response = client.chat.completions.create(
+    model="YOUR_SUPPORTED_MODEL",
+    messages=[
+        {
+            "role": "user",
+            "content": f"Write a hypothetical answer to: {question}"
+        }
+    ]
+)
+hypothetical_doc = response.choices[0].message.content
+# Step 2: Convert hypothetical document to vector
+hyde_embedding = embedding_model.encode(
+    hypothetical_doc
+).tolist()
+# Step 3: Search Qdrant
+results = client_qdrant.query_points(
+    collection_name="my_docs",
+    query=hyde_embedding,
+    limit=3
+)
+
+
+------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
