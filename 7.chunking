@@ -1,0 +1,193 @@
+1. What is chunking?
+Chunking means splitting a large document into smaller pieces of text called chunks before converting them into embeddings.
+  Chunking splits large documents into smaller pieces to fit LLM context windows and improve semantic search in Retrieval-Augmented Generation (RAG) pipelines
+
+  
+For example, suppose your uploaded PDF contains 10 pages.
+Instead of converting the entire PDF into one embedding, we split it into smaller chunks.
+Original PDF
+10-page document
+
+After chunking
+Chunk 1: Pages 1–2
+Smaller text section
+
+Chunk 2: Pages 2–3
+Smaller text section
+
+Chunk 3: Pages 3–4
+Smaller text section
+
+Chunk 4: Pages 4–5
+Smaller text section
+
+Illustrative example; actual chunks are usually split by text length or document structure, not necessarily by pages.
+
+2. Why do we need chunking?
+Imagine your PDF contains 100 pages, but the user asks:
+
+"What is Django ORM?"
+
+If you send the entire PDF to the LLM:
+- Unnecessary information is included.
+- More tokens are consumed.
+- Relevant information can be harder to identify.
+With chunking:
+- We split the PDF into smaller pieces.
+- Retrieve only relevant chunks.
+- Send those chunks to the LLM.
+Remember: Chunking helps us retrieve relevant information instead of searching through an entire document as one unit.
+
+3. What are chunk size and chunk overlap?
+These are two important concepts we'll understand next.
+- Chunk size: How much text each chunk contains.
+- Chunk overlap: How much text is repeated between consecutive chunks.
+For example:
+Chunk 1
+Django is a Python web framework. It provides an ORM for database operations.
+Chunk 2
+It provides an ORM for database operations. It also supports authentication.
+
+-------------------------------------------------------------------------------
+RAG – Chunk Size and Chunk Overlap
+We already know chunking means splitting a large document into smaller text pieces. Now let's understand how large each piece should be.
+1. Chunk size
+Chunk size defines how much text goes into one chunk.
+
+For example, suppose we have 1,000 words.
+
+If chunk size is 200 words:
+- Chunk 1 → 200 words
+- Chunk 2 → 200 words
+- Chunk 3 → 200 words
+- Chunk 4 → 200 words
+- Chunk 5 → 200 words
+We get 5 chunks.
+Illustrative example using words; actual chunking tools often measure characters or tokens.
+
+2. Chunk overlap
+Chunk overlap means repeating some text from the previous chunk in the next chunk.
+
+Why?
+Because splitting text can break the context of a sentence or topic.
+Example:
+Chunk 1
+Django is a Python framework. It provides an ORM for database operations.
+Chunk 2
+It provides an ORM for database operations.
+Django also provides authentication and security features.
+
+The repeated sentence preserves context between chunks.
+
+3. Practical example
+Suppose:
+- Chunk size = 200 characters
+- Chunk overlap = 50 characters
+Then:
+Chunk	Characters
+Chunk 1	1–200
+Chunk 2	151–350
+Chunk 3	301–500
+
+Notice that 50 characters are repeated between consecutive chunks.
+
+4. Python implementation
+We'll use LangChain's RecursiveCharacterTextSplitter.
+Install:
+pip install langchain-text-splitters
+
+Code:
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+text = """Django is a Python web framework.It provides an ORM for database operations.Django also supports authentication."""
+splitter = RecursiveCharacterTextSplitter(    chunk_size=100,    chunk_overlap=20)
+chunks = splitter.split_text(text)
+for i, chunk in enumerate(chunks):   
+        print(f"Chunk {i+1}: {chunk}")
+
+
+- chunk_size=100 → maximum target chunk length is 100 characters.
+- chunk_overlap=20 → tries to preserve 20 characters between chunks.
+- split_text() → splits the input text.
+5. What happens if we choose incorrect values?
+Setting	Problem
+Very small chunks	Important context may be lost
+Very large chunks	Irrelevant information may be retrieved
+No overlap	Context can break at boundaries
+Too much overlap	Duplicate information and extra storage
+
+Interview answer: Chunk size determines the amount of text in each chunk, while chunk overlap preserves some text between consecutive chunks to maintain context during retrieval.
+----------------------------------------------------------------------------------
+
+RAG CHUNKING STRATERGIES
+
+1. Fixed-size chunking
+This is the simplest approach.
+We split text based on a fixed number of characters or tokens, regardless of sentence or paragraph boundaries.
+
+2. Recursive character text splitting
+This is a commonly used strategy in RAG applications.
+Instead of splitting blindly, it tries to split text using separators in this order:
+1. Paragraph (\n\n)
+2. New line (\n)
+3. Sentence/space ( )
+4. Character ("")
+It tries larger boundaries first and moves to smaller ones if necessary.
+
+3. Sentence or Paragraph-Based Chunking: 
+Respects natural writing structure by splitting at sentence punctuation (., !, ?) or paragraph boundaries. 
+This keeps individual ideas intact better than arbitrary character counts.
+
+4.Semantic Chunking: 
+Measures the cosine similarity of embeddings between consecutive sentences. 
+When similarity drops past a threshold (signifying a shift in topic), the text splits. It preserves thematic coherence but requires more compute
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
