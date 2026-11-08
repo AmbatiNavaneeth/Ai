@@ -1,0 +1,249 @@
+RAG – Document Loading and Parsing
+Before chunking, we need to extract text from uploaded documents.
+1. What is document loading?
+Document loading means reading a file and bringing its content into our Python application.
+For example, a user uploads:
+- PDF
+- DOCX
+- TXT
+- CSV
+Our application needs to read these files before processing them.
+2. What is document parsing?
+Parsing means extracting meaningful content from the loaded file.
+
+For example, a PDF may contain text, tables, headings and images. Parsing extracts the content that our RAG pipeline can process.
+
+Remember the difference:
+- Loading = opening and reading the file.
+- Parsing = extracting its content.
+3. How do we extract PDF text in Python?
+We'll use pypdf.
+
+Install:
+pip install pypdf
+Code:
+from pypdf import PdfReader
+reader = PdfReader("resume.pdf")
+text = ""
+for page in reader.pages:    
+      page_text = page.extract_text() or ""  
+      text += page_text + "\n"print(text)
+
+Explanation:
+- PdfReader() opens the PDF.
+- reader.pages accesses all pages.
+- extract_text() extracts text from each page.
+- We combine the extracted text into one string.
+
+4. What happens after extraction?
+Let's connect everything we've learned.
+
+1
+Upload PDF
+User uploads a resume or document.
+
+2
+Document loading
+Python opens the PDF using pypdf.
+
+3
+Text extraction
+Extract text from each page.
+
+4
+Chunking
+Split the extracted text into smaller pieces.
+
+5
+Embedding
+Convert each chunk into a vector.
+
+6
+Vector database
+Store vectors, text and metadata.
+
+5. Important: What if the PDF contains scanned images?
+pypdf extracts text from text-based PDFs.
+
+But suppose someone uploads a scanned PDF where every page is just an image.
+
+extract_text() may return nothing.
+
+In that case, we need OCR (Optical Character Recognition).
+
+Popular tools:
+- Tesseract OCR
+- EasyOCR
+- PaddleOCR
+OCR converts text inside images into machine-readable text.
+Interview question
+Q: What happens if a PDF contains scanned images instead of selectable text?
+-----------------------------------------------------------------------
+-------------------------------------------------------------------------
+Metadata and Advanced Filtering.
+
+RAG – Metadata
+We already learned that Qdrant stores vectors and payloads. Now let's understand why metadata is important.
+1. What is metadata?
+Metadata is additional information about a document or chunk.
+
+For example, suppose you upload a resume PDF.
+The extracted chunks contain actual text, while metadata describes where that text came from.
+
+Example:
+{    "text": "Python, Django, MySQL and React.",    
+      "metadata": {  "filename": "resume.pdf",  
+                      "page": 2,  
+                      "category": "skills", 
+                      "user_id": "101"    }}
+
+Here:
+- text → Actual document content.
+- filename → Source document.
+- page → Page number.
+- category → Type of information.
+- user_id → Document owner.
+
+2. Why do we need metadata?
+Imagine your vector database contains 1,000 chunks from different PDFs.
+
+A user asks:
+
+"Show me information from my resume only."
+Without metadata, it may retrieve chunks from other documents too.
+With metadata, we can filter by filename or user ID.
+
+For example:
+query_filter=models.Filter(    
+    must=[        
+         models.FieldCondition(key="filename", match=models.MatchValue(value="resume.pdf"))])
+
+Now Qdrant searches only chunks belonging to resume.pdf.
+
+3. Metadata vs Embeddings
+Metadata	Embedding
+Stores additional information	Stores numerical representation of text
+Used for filtering	Used for similarity search
+Example: page number	Example: [0.21, 0.45, ...]
+Exact conditions	Semantic matching
+
+Both work together during retrieval.
+4. Real-world RAG example
+Suppose you're building your personal portfolio chatbot.
+
+You upload:
+- Resume.pdf
+- Projects.pdf
+- Internship.pdf
+You can store metadata like this:
+payload = {    "text": "Developed a service marketplace using Django.",    "filename": "projects.pdf",    "category": "projects",    "page": 3}
+
+
+If a recruiter asks about your projects, your backend can filter by category="projects" and then perform vector similarity search.
+How retrieval works
+Recruiter asks: Tell me about your projects
+Backend applies metadata filter
+Qdrant performs vector similarity search
+Relevant project chunks returned
+
+Important: Metadata filtering is optional. You can perform vector search without filters too.
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------
+RAG – Hybrid Search
+What is hybrid search in RAG?
+Hybrid search combines keyword-based search, such as BM25, with semantic vector search. It helps retrieve documents using both exact keyword matching and contextual meaning, improving retrieval quality.
+
+1. First, understand two types of search
+Before understanding hybrid search, let's compare keyword search and vector search.
+
+A. Keyword search
+Finds documents based on matching words.
+Example:
+User query: "Python developer"
+A keyword search looks for documents containing those exact words.
+Common technology: BM25.
+
+B. Vector search
+Finds documents based on semantic meaning using embeddings and similarity.
+Example:
+User query: "How can I build backend applications?"
+It may retrieve a chunk containing:
+"Django is a Python framework used for backend development."
+Even though the exact words are different, the meaning is similar.
+
+2. What is hybrid search?
+Hybrid search combines keyword search and vector search to retrieve relevant documents.
+
+Why combine them?
+- Keyword search is good at exact terms, names, IDs and technical keywords.
+- Vector search is good at understanding meaning and context.
+For example, imagine a resume database.
+
+User asks: "What did Navaneeth build using Django?"
+- Keyword search finds chunks containing Django.
+- Vector search finds chunks semantically related to projects and development.
+- Hybrid search combines both sets of results.
+
+3. How does hybrid search work?
+
+User query
+Keyword search
+BM25
+
+Finds exact keyword matches
+Vector search
+Embeddings
+Finds semantic matches
+
+Combine and rank results
+
+Final relevant chunks (Top K)
+
+4. What is BM25?
+BM25 is a ranking algorithm used in keyword-based search.
+
+It calculates how relevant a document is to a query based on factors such as:
+- How often the query terms appear.
+- How rare those terms are across documents.
+- The document's length.
+Example:
+Query: Django REST Framework
+
+A document containing these exact terms can receive a high BM25 score.
+Remember:
+- BM25 → Keyword-based retrieval.
+- Embeddings + cosine similarity → Semantic retrieval.
+
+5. How are both results combined?
+One popular technique is RRF (Reciprocal Rank Fusion).
+RRF combines the rankings from keyword search and vector search to produce one final ranking.
+You don't need to memorize its formula now. Just understand that it helps combine results from both retrieval methods.
+Qdrant supports hybrid search with dense vectors, sparse vectors and RRF fusion.
+
+6. When should we use hybrid search?
+Situation                             	Useful search
+Exact product ID	                        Keyword
+Technical terms like Django	              Keyword
+Questions with different wording	         Vector
+Questions needing exact terms and meaning 	Hybrid
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
