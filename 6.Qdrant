@@ -67,3 +67,168 @@ HNSW	Graph-based approximate nearest-neighbour search algorithm
 One important concept:
 
 HNSW (Hierarchical Navigable Small World) is an algorithm that helps Qdrant search for nearest vectors efficiently without comparing every vector in a large dataset.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+1. HNSW (Hierarchical Navigable Small World)
+HNSW is an algorithm used by vector databases to find similar vectors quickly.
+
+Imagine you have 1 lakh document chunks. Comparing your query vector with every single vector takes time.
+HNSW creates a graph structure that helps it navigate towards the nearest vectors without checking every vector.
+
+Think of it like Google Maps:
+- Instead of checking every road, it follows useful routes.
+- It reaches the destination faster.
+- HNSW navigates through connected vectors to find similar ones.
+Interview answer: HNSW is an approximate nearest-neighbor search algorithm that uses a hierarchical graph structure to find similar vectors efficiently.
+
+
+2. Filtering in Qdrant
+Filtering means searching only within data that matches specific conditions.
+
+Suppose your database contains documents from multiple categories:
+Document	Category
+Python basics	Programming
+Django REST API	Programming
+Cricket rules	Sports
+Football rules	Sports
+
+User asks: "Explain Python" and you want to search only programming documents.
+
+You can apply a filter:
+
+from qdrant_client import models
+results = client.query_points(
+    collection_name="my_docs",
+    query=query_embedding,
+    query_filter=models.Filter(
+        must=[
+            models.FieldCondition(
+                key="category",
+                match=models.MatchValue(value="Programming")
+            )
+        ]
+    ),
+    limit=2
+)
+
+
+Here:
+- query_embedding → user's query vector.
+- query_filter → searches only Programming documents.
+- limit=2 → returns the top 2 matching results.
+
+For filtering to work, you must store metadata in the payload:
+payload={
+    "text": "Python is a programming language",
+    "category": "Programming"
+}
+
+
+In Qdrant filtering, must, should, and must_not define conditions for selecting records.
+
+Think of them as SQL conditions.
+1. must – AND condition
+All conditions must be satisfied.
+
+query_filter=models.Filter(
+    must=[
+        models.FieldCondition(
+            key="category",
+            match=models.MatchValue(value="Programming")
+        ),
+        models.FieldCondition(
+            key="language",
+            match=models.MatchValue(value="Python")
+        )
+    ]
+)
+
+2. should – OR condition
+At least one condition should match.
+
+query_filter=models.Filter(
+    should=[
+        models.FieldCondition(
+            key="language",
+            match=models.MatchValue(value="Python")
+        ),
+        models.FieldCondition(
+            key="language",
+            match=models.MatchValue(value="Java")
+        )
+    ]
+)
+
+
+3. must_not – NOT condition
+Exclude records matching the condition.
+
+query_filter=models.Filter(
+    must_not=[
+        models.FieldCondition(
+            key="category",
+            match=models.MatchValue(value="Sports")
+        )
+    ]
+)
+
+
+Exactly! must, should, and must_not control which chunks can be retrieved from Qdrant.
+
+For example, when a user asks a question:
+1. Convert the query into a vector.
+2. Apply metadata filters (must, should, must_not).
+3. Perform similarity search on the eligible chunks.
+4. Retrieve the Top K matching chunks.
+5. Send their text + original query to the LLM.
+
+
+
+Filtering is applied by your backend (RAG application), not automatically by the user.
+
+There are two possibilities:
+1. User-driven filtering: User selects a category, such as Python or Django. Your backend converts that selection into a Qdrant filter.
+2. Application-driven filtering: Your backend automatically applies filters based on metadata, document type, permissions, etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
