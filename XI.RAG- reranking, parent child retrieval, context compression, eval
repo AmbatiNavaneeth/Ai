@@ -1,0 +1,281 @@
+What is re-ranking in RAG?
+Re-ranking is a second-stage retrieval technique that reorders initially retrieved documents based on their relevance to the user's query. 
+Cross-encoder models are commonly used to improve the quality of retrieved context before sending it to the LLM.
+
+Why do we need it?
+Vector search retrieves the Top K chunks based on embedding similarity. But sometimes the retrieved chunks aren't in the best order or may include less relevant results.
+Re-ranking helps improve the final selection.
+
+3. Architecture
+User query -> Vector search (retrieve Top 10 chunks) -> Re-ranking model (evaluate query + each chunk) -> Reordered results (select Top 3) -> LLM generates final answer
+
+What is a re-ranking model?
+A re-ranking model evaluates how relevant a particular document is to a query.One popular approach is a Cross-Encoder.
+Unlike a bi-encoder embedding model, which independently converts the query and document into vectors, a cross-encoder processes the query and document together.
+
+Example:
+Query: What are Django ORM benefits?
+Document: Django ORM supports CRUD operations.
+Cross-encoder → Relevance score
+
+It gives a relevance score for each query-document pair.Higher score generally means more relevant.
+Popular re-ranking models:
+- BGE Reranker
+- Cohere Rerank
+- Cross-Encoder models from Sentence Transformers
+
+5. Bi-Encoder vs Cross-Encoder
+Encodes query and document separately     	Processes query and document together
+Fast retrieval	                           More accurate relevance scoring in many cases
+Used for initial vector search	                 Used for re-ranking
+Efficient for large collections	            Usually slower for many documents
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+--Parent-Child Retrieval--
+Parent-Child Retrieval is a RAG technique where large parent chunks are divided into smaller child chunks. 
+Retrieval is performed on child chunks for precision, and their corresponding parent chunks are fetched to provide more context to the LLM.
+
+Why do we need it?
+- Small chunks help retrieve precise information.
+- Large chunks provide better context.
+- Parent-Child Retrieval combines both advantages.
+
+1. Convert the child chunks into embeddings and store them.
+2. Convert the user's question into an embedding.
+3. Search for the most relevant child chunk.
+4. Find the parent associated with that child.
+5. Retrieve the parent chunk.
+6. Send the parent text and original question to the LLM.
+
+User query-> Search child chunks-> Find matching child chunk-> Retrieve its parent chunk-> LLM receives parent text + question
+
+4. How do we connect parent and child chunks?
+We store the parent ID in each child's metadata.
+Example:
+parent = {    "id": "parent_1",    "text": "Complete Django explanation..."}
+child = {    "id": "child_1",    "text": "Django ORM allows database operations.",    "parent_id": "parent_1"}
+When child_1 is retrieved, the application uses parent_id to fetch parent_1.
+
+5. Normal chunking vs             Parent-Child Retrieval
+Normal RAG	                          Parent-Child RAG
+Searches regular chunks	         Searches smaller child chunks
+Sends retrieved chunks	       Retrieves associated parent content
+Can lose surrounding context 	Provides more surrounding context
+Simpler architecture	            Requires parent-child mapping
+
+
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+Context compression 
+Context compression is a technique in RAG that reduces retrieved information by removing irrelevant content while preserving useful information. 
+It helps reduce token usage, API costs, and noise, improving the quality of LLM responses
+
+2. Why do we need it?
+Imagine your vector database retrieves 5 chunks, each containing 500 words.But your question only needs 2–3 important sentences.
+Sending all 2,500 words:
+- Uses more tokens.
+- Increases API cost.
+- Can distract the LLM with irrelevant information.
+- May reduce answer quality.
+Context compression solves this problem.
+
+User Question
+What Django experience is mentioned in my resume?
+            | 
+Retriever
+Retrieves 5 relevant chunks
+            |
+Context Compressor
+Removes irrelevant sentences and keeps useful information
+            |
+LLM
+Receives compressed context and answers
+
+Common context compression techniques
+   Technique                             	Meaning
+Filtering	                           Remove irrelevant chunks
+Extractive compression	    Keep only relevant sentences from chunks
+Abstractive compression    	Rewrite lengthy content into a shorter summary
+LLM-based compression	      Use an LLM to identify and retain relevant information
+
+Important: Compression must not change the original meaning or remove facts needed to answer the question.
+
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+
+Advanced RAG Architecture
+So far, we have learned the basic RAG pipeline and techniques to improve it. Now let's understand how these techniques work together in a real-world RAG application.
+1. What is Advanced RAG?
+Advanced RAG means improving the basic RAG pipeline using techniques such as:
+- Query rewriting
+- Hybrid search
+- Re-ranking
+- Metadata filtering
+- Parent-child retrieval
+- Context compression
+- RAG evaluation
+The goal is to improve retrieval accuracy, answer quality, and reliability.
+
+2. Basic RAG vs Advanced RAG
+  Basic RAG	                       Advanced RAG
+Direct query search     	        Query rewriting
+Only vector search              	Hybrid search
+Directly uses retrieved chunks  	Re-ranking
+Sends entire chunks          	Context compression
+Basic retrieval           	Metadata and parent-child retrieval
+Limited evaluation          	RAG evaluation(RAGA)
+
+3. Advanced RAG architecture flow
+Let's connect everything we learned.
+Advanced RAG Pipeline
+1. User Query
+User asks a question
+
+2. Query Transformation
+Rewrite, expand or generate multiple queries
+
+3. Retrieval
+Hybrid search + metadata filtering + vector database
+
+4. Re-ranking
+Sort retrieved chunks by relevance
+
+5. Context Processing
+Parent-child retrieval + context compression
+
+6. LLM Generation
+Generate an answer using retrieved context
+
+7. RAG Evaluation
+Measure answer and retrieval quality
+
+
+4. Real-world example: Your Personal Portfolio Chatbot
+Imagine a recruiter asks:
+"What backend technologies have you worked with, and explain your projects?"
+Here's what happens:
+1. Query transformation makes the question easier to search.
+2. Hybrid search finds relevant resume and project information.
+3. Re-ranking selects the most relevant chunks.
+4. Parent-child retrieval provides enough project context.
+5. Context compression removes unnecessary information.
+6. LLM generates an answer using only your actual resume information.
+7. Evaluation checks whether the answer is relevant and supported by the resume.
+5. Important: Advanced RAG is not one fixed architecture
+You don't need every technique in every application.
+
+For example:
+- Small resume chatbot: vector search + metadata + reranking may be enough.
+- Large company knowledge base: hybrid search + query transformation + reranking may help.
+- Large documents with complex structure: parent-child retrieval can be useful.
+Choose techniques based on the problem.
+
+What should you do next?
+My recommendation: Build your Personal Portfolio RAG Chatbot now.
+
+Use this stack:
+Component	Technology
+Backend	FastAPI
+LLM	Groq
+Embeddings	Sentence Transformers
+Vector database	Qdrant
+PDF extraction	pypdf
+Validation	Pydantic
+Evaluation	Ragas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
