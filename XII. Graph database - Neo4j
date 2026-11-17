@@ -1,0 +1,187 @@
+Knowledge Graphs
+1. What is a Knowledge Graph?
+A Knowledge Graph is a way of storing information as entities (things) and relationships (connections between things).
+
+In simple words, it stores not only information but also how different pieces of information are connected.
+2. Understand with an example
+Imagine your resume contains:
+- Navaneeth knows Python.
+- Navaneeth developed Service Hub.
+- Service Hub uses Django.
+- Django uses Python.
+
+Here we have three important components:
+Component	Meaning	Example
+Node	An entity or thing	Navaneeth, Python
+Edge	Relationship between nodes	knows, developed
+Property	Additional information	Python category: Programming Language
+
+3. How is it different from a Vector Database?
+
+       Vector Database	                    Knowledge Graph
+Stores vector embeddings                	Stores entities and relationships
+Finds semantically similar information	Finds connected information
+Uses similarity search	                  Uses graph traversal and queries
+Useful for semantic retrieval	          Useful for relationship-based retrieval
+
+Vector DB: Searches for semantically relevant chunks.
+Knowledge Graph: Follows the relationship Service Hub → uses → Django.
+
+What is Graph RAG?
+Graph RAG combines Knowledge Graphs with RAG.
+Normal RAG retrieves relevant text chunks using vector similarity.
+Graph RAG can also use relationships between entities to retrieve connected informatio
+
+
+1. What is Neo4j?
+Neo4j is a graph database that stores data as nodes and relationships instead of traditional rows and columns.
+In simple words, it stores information as connected entities.
+
+For example, instead of storing a student's skills in a normal table, Neo4j can represent:
+Navaneeth → KNOWS → Python
+Navaneeth → BUILT → Service Hub
+Service Hub → USES → Django
+
+What is Cypher?
+Cypher is the query language used to create, retrieve, update and delete data in Neo4j.
+
+Just like:
+- MySQL uses SQL.
+- Neo4j uses Cypher.
+Let's see some basic commands.
+
+=>Create nodes:
+CREATE (:Person {name: "Navaneeth"})
+CREATE (:Skill {name: "Python"})
+
+=>Create a relationship:
+MATCH (p:Person {name: "Navaneeth"})
+MATCH (s:Skill {name: "Python"})
+CREATE (p)-[:KNOWS]->(s)
+
+=>Retrieve connected information:
+MATCH (p:Person)-[:KNOWS]->(s:Skill)
+RETURN p, s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
